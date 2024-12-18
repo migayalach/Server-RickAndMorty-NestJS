@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { CreateCharacterDto } from './dto/create-character.dto';
 import { UpdateCharacterDto } from './dto/update-character.dto';
+import { results } from 'dataBase/local';
 
 @Injectable()
 export class CharactersService {
@@ -9,7 +10,7 @@ export class CharactersService {
   }
 
   findAll() {
-    return `This action returns all characters`;
+    return results;
   }
 
   findOne(id: number) {
