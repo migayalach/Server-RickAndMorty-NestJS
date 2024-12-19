@@ -1,20 +1,20 @@
 import { HttpModule, HttpService } from '@nestjs/axios';
 import { Injectable } from '@nestjs/common';
 import { CreateLoadingCharacterDto } from './dto/create-loading-character.dto';
-import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { CharactersAPI } from './classAux/charactersAPI';
 
 @Injectable()
 export class LoadingCharactersService {
-  constructor(private readonly httpService: HttpService) {}
+  constructor(
+    private readonly httpService: HttpService,
+    private readonly charactersAPI: CharactersAPI,
+  ) {}
 
   create(createLoadingCharacterDto: CreateLoadingCharacterDto) {
     return 'This action adds a new loadingCharacter';
   }
 
-  findAll(): Observable<any> {
-    return this.httpService
-      .get('https://rickandmortyapi.com/api/character')
-      .pipe(map((response) => response.data.results));
+  findAll() {
+    return this.charactersAPI.loadingCharacters();
   }
 }
