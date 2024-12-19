@@ -6,6 +6,7 @@ import { CharactersModule } from './characters/characters.module';
 import { FavoritesModule } from './favorites/favorites.module';
 import { AuditFavoritesModule } from './audit-favorites/audit-favorites.module';
 import { LoadingCharactersModule } from './loading-characters/loading-characters.module';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { LoadingCharactersModule } from './loading-characters/loading-characters
     CharactersModule,
     MongooseModule.forRoot('mongodb://localhost/rickAndMorty'),
     LoadingCharactersModule,
+    ConfigModule.forRoot({ isGlobal: true }),
   ],
   controllers: [],
   providers: [],
