@@ -1,10 +1,10 @@
 import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
-import { Gender } from '@enum/character.enum';
+import { Gender as GenderEnum } from '@enum/character.enum';
 
 @Schema()
-export class GenderSchema {
+export class Gender {
   @Prop()
-  nameGender: Gender;
+  nameGender: GenderEnum;
 }
 
-export const Schema_Gender = SchemaFactory.createForClass(GenderSchema);
+export const Gender_Schema = SchemaFactory.createForClass(Gender);
