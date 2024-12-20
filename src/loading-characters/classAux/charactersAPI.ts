@@ -3,7 +3,10 @@ import { Injectable } from '@nestjs/common';
 import { map } from 'rxjs/operators';
 import { ConfigService } from '@nestjs/config';
 import { lastValueFrom } from 'rxjs';
-import { CharactersInterface } from '@interfaces/character.interface';
+import {
+  CharactersInterface,
+  CharacterLists,
+} from '@interfaces/character.interface';
 import { Gender, Status, Species } from '@enum/character.enum';
 
 @Injectable()
@@ -26,7 +29,7 @@ export class CharactersAPI {
       .filter((item, index, resultMap) => resultMap.indexOf(item) === index);
   }
 
-  public async loadingCharacters(): Promise<CharactersInterface[]> {
+  public async loadingCharacters(): Promise<CharacterLists> {
     const characters: CharactersInterface[] = [];
     const pages: number = await lastValueFrom(
       this.httpService
@@ -45,7 +48,7 @@ export class CharactersAPI {
       page++;
     }
 
-    const clearCharacters = characters.map(
+    const listCharacters = characters.map(
       ({ name, status, species, gender, image }) => ({
         name,
         status,
@@ -56,18 +59,23 @@ export class CharactersAPI {
     );
 
     const listStatus: Status[] = this.extractUniqueAttributes(
-      clearCharacters,
+      listCharacters,
       'status',
     );
     const listSpecies: Species[] = this.extractUniqueAttributes(
-      clearCharacters,
+      listCharacters,
       'species',
     );
     const listGender: Gender[] = this.extractUniqueAttributes(
-      clearCharacters,
+      listCharacters,
       'gender',
     );
 
-    return clearCharacters;
+    return {
+      listStatus,
+      listSpecies,
+      listGender,
+      listCharacters,
+    };
   }
 }
