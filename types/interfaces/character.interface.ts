@@ -7,3 +7,10 @@ export interface CharactersInterface {
   gender: Gender;
   image?: string;
 }
+
+export interface CharacterLists {
+  listStatus: Status[];
+  listSpecies: Species[];
+  listGender: Gender[];
+  listCharacters: CharactersInterface[];
+}
