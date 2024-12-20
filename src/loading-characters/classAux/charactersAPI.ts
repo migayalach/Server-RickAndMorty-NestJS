@@ -3,6 +3,8 @@ import { Injectable } from '@nestjs/common';
 import { map } from 'rxjs/operators';
 import { ConfigService } from '@nestjs/config';
 import { lastValueFrom } from 'rxjs';
+import { CharactersInterface } from '@interfaces/character.interface';
+import { Gender, Status, Species } from '@enum/character.enum';
 
 @Injectable()
 export class CharactersAPI {
@@ -15,15 +17,18 @@ export class CharactersAPI {
     this.API_CHARACTERS = this.configService.get<string>('URL_API');
   }
 
-  private extractUniqueAttributes(characters, attribute) {
+  private extractUniqueAttributes(
+    characters: CharactersInterface[],
+    attribute: string,
+  ) {
     return characters
       .map((data) => data[attribute])
       .filter((item, index, resultMap) => resultMap.indexOf(item) === index);
   }
 
-  public async loadingCharacters() {
-    const characters = [];
-    const pages = await lastValueFrom(
+  public async loadingCharacters(): Promise<CharactersInterface[]> {
+    const characters: CharactersInterface[] = [];
+    const pages: number = await lastValueFrom(
       this.httpService
         .get(`${this.API_CHARACTERS}`)
         .pipe(map((response) => response.data.info.pages)),
@@ -31,7 +36,7 @@ export class CharactersAPI {
 
     let page = 1;
     while (page <= pages) {
-      const result = await lastValueFrom(
+      const result: CharactersInterface[] = await lastValueFrom(
         this.httpService
           .get(`${this.API_CHARACTERS}?page=${page}`)
           .pipe(map((response) => response.data.results)),
@@ -50,12 +55,19 @@ export class CharactersAPI {
       }),
     );
 
-    const listStatus = this.extractUniqueAttributes(clearCharacters, 'status');
-    const listSpecies = this.extractUniqueAttributes(
+    const listStatus: Status[] = this.extractUniqueAttributes(
+      clearCharacters,
+      'status',
+    );
+    const listSpecies: Species[] = this.extractUniqueAttributes(
       clearCharacters,
       'species',
     );
-    const listGender = this.extractUniqueAttributes(clearCharacters, 'gender');
+    const listGender: Gender[] = this.extractUniqueAttributes(
+      clearCharacters,
+      'gender',
+    );
+
     return clearCharacters;
   }
 }
