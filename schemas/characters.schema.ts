@@ -2,7 +2,7 @@ import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
 import { Gender, Species, Status, State, Create } from '@enum/character.enum';
 
 @Schema()
-export class CharactersSchema {
+export class Characters {
   @Prop()
   name: string;
   @Prop()
@@ -21,4 +21,4 @@ export class CharactersSchema {
   stars: number;
 }
 
-export const Schema_Characters = SchemaFactory.createForClass(CharactersSchema);
+export const Characters_Schema = SchemaFactory.createForClass(Characters);
