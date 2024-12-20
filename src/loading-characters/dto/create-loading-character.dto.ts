@@ -1,4 +1,5 @@
-import { IsString, IsNotEmpty, IsOptional } from 'class-validator';
+import { IsString, IsNotEmpty, IsOptional, IsEnum } from 'class-validator';
+import { Status } from '@enum/character.enum';
 
 export class CreateLoadingCharacterDto {
   @IsNotEmpty()
@@ -20,4 +21,9 @@ export class CreateLoadingCharacterDto {
   @IsNotEmpty()
   @IsString()
   image: string;
+}
+
+export class CreateStatusDto {
+  @IsEnum(Status, { each: true })
+  listStatus: Status[];
 }
