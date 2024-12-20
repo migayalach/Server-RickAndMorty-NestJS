@@ -1,10 +1,10 @@
 import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
-import { Status } from '@enum/character.enum';
+import { Status as StatusEnum } from '@enum/character.enum';
 
 @Schema()
-export class StatusSchema {
+export class Status {
   @Prop()
-  nameStatus: Status;
+  nameStatus: StatusEnum;
 }
 
-export const Schema_Status = SchemaFactory.createForClass(StatusSchema);
+export const Status_Schema = SchemaFactory.createForClass(Status);
