@@ -8,6 +8,12 @@ import {
   CharacterLists,
 } from '@interfaces/character.interface';
 import { Gender, Status, Species } from '@enum/character.enum';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
+import { Characters } from '@schemas/characters.schema';
+import { Gender as GenderSchema } from '@schemas/gender.schema';
+import { Species as SpeciesSchema } from '@schemas/species.schema';
+import { Status as StatusSchema } from '@schemas/status.schema';
 
 @Injectable()
 export class CharactersAPI {
@@ -16,6 +22,10 @@ export class CharactersAPI {
   constructor(
     private readonly httpService: HttpService,
     private readonly configService: ConfigService,
+    @InjectModel(StatusSchema.name) private statusModel: Model<StatusSchema>,
+    @InjectModel(SpeciesSchema.name) private speciesModel: Model<SpeciesSchema>,
+    @InjectModel(GenderSchema.name) private genderModel: Model<GenderSchema>,
+    // @InjectModel(Characters.name) private charactersModel: Model<Characters>,
   ) {
     this.API_CHARACTERS = this.configService.get<string>('URL_API');
   }
@@ -77,5 +87,88 @@ export class CharactersAPI {
       listGender,
       listCharacters,
     };
+  }
+
+  public async existingStatus(statusList: any) {
+    const countElements = await this.statusModel.countDocuments();
+    if (!countElements) {
+      const listPromises = statusList.map(async (status: string) => {
+        const createdStatus = new this.statusModel({
+          nameStatus: status,
+        });
+        return createdStatus.save();
+      });
+      return Promise.all(listPromises);
+    } else {
+      for (let i = 0; i < statusList.length; i++) {
+        const existItem = await this.statusModel.findOne({
+          nameStatus: statusList[i],
+        });
+        if (!existItem) {
+          const createdStatus = new this.statusModel({
+            nameStatus: statusList[i],
+          });
+          return createdStatus.save();
+        }
+      }
+    }
+    return await this.statusModel.find();
+  }
+
+  public async existingSpecies(speciesList: any) {
+    const countElements = await this.speciesModel.countDocuments();
+    if (!countElements) {
+      const listPromises = speciesList.map(async (status: string) => {
+        const createdSpecies = new this.speciesModel({
+          nameSpecie: status,
+        });
+        return createdSpecies.save();
+      });
+      return Promise.all(listPromises);
+    } else {
+      for (let i = 0; i < speciesList.length; i++) {
+        const existItem = await this.speciesModel.findOne({
+          nameSpecie: speciesList[i],
+        });
+        if (!existItem) {
+          const createdStatus = new this.speciesModel({
+            nameSpecie: speciesList[i],
+          });
+          return createdStatus.save();
+        }
+      }
+    }
+    return await this.speciesModel.find();
+  }
+
+  public async existingGender(genderList: any) {
+    const countElements = await this.genderModel.countDocuments();
+    if (!countElements) {
+      const listPromises = genderList.map(async (status: string) => {
+        const createdGender = new this.genderModel({
+          nameGender: status,
+        });
+        return createdGender.save();
+      });
+      return Promise.all(listPromises);
+    } else {
+      for (let i = 0; i < genderList.length; i++) {
+        const existItem = await this.genderModel.findOne({
+          nameGender: genderList[i],
+        });
+        if (!existItem) {
+          const createdStatus = new this.genderModel({
+            nameGender: genderList[i],
+          });
+          return createdStatus.save();
+        }
+      }
+    }
+    return await this.genderModel.find();
+  }
+
+  public async existingCharacters(charactersList: any) {
+    console.log(':D');
+    return 'characters';
   }
 }
