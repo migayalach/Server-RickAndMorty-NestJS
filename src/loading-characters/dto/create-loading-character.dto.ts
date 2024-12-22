@@ -1,22 +1,22 @@
 import { IsString, IsNotEmpty, IsOptional, IsEnum } from 'class-validator';
-import { Status } from '@enum/character.enum';
+import { Status, Species, Gender } from '@enum/character.enum';
 
 export class CreateLoadingCharacterDto {
   @IsNotEmpty()
   @IsString()
   name: string;
 
-  @IsString()
+  @IsEnum(Status)
   @IsOptional()
-  status: string;
+  status: Status;
 
-  @IsString()
+  @IsEnum(Species)
   @IsOptional()
-  species: string;
+  species: Species;
 
   @IsNotEmpty()
-  @IsString()
-  gender: string;
+  @IsEnum(Gender)
+  gender: Gender;
 
   @IsNotEmpty()
   @IsString()
@@ -26,4 +26,14 @@ export class CreateLoadingCharacterDto {
 export class CreateStatusDto {
   @IsEnum(Status, { each: true })
   listStatus: Status[];
+}
+
+export class CreateSpeciesDto {
+  @IsEnum(Species, { each: true })
+  listSpecies: Species[];
+}
+
+export class CreateGenderDto {
+  @IsEnum(Gender, { each: true })
+  listGender: Gender[];
 }
