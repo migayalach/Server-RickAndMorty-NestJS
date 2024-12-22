@@ -25,7 +25,7 @@ export class CharactersAPI {
     @InjectModel(StatusSchema.name) private statusModel: Model<StatusSchema>,
     @InjectModel(SpeciesSchema.name) private speciesModel: Model<SpeciesSchema>,
     @InjectModel(GenderSchema.name) private genderModel: Model<GenderSchema>,
-    // @InjectModel(Characters.name) private charactersModel: Model<Characters>,
+    @InjectModel(Characters.name) private charactersModel: Model<Characters>,
   ) {
     this.API_CHARACTERS = this.configService.get<string>('URL_API');
   }
@@ -89,86 +89,92 @@ export class CharactersAPI {
     };
   }
 
-  public async existingStatus(statusList: any) {
-    const countElements = await this.statusModel.countDocuments();
-    if (!countElements) {
-      const listPromises = statusList.map(async (status: string) => {
-        const createdStatus = new this.statusModel({
-          nameStatus: status,
-        });
-        return createdStatus.save();
+  public async addStatus(statusList: any) {
+    const listPromises = statusList.map(async (status: string) => {
+      const createdStatus = new this.statusModel({
+        nameStatus: status,
       });
-      return Promise.all(listPromises);
-    } else {
-      for (let i = 0; i < statusList.length; i++) {
-        const existItem = await this.statusModel.findOne({
-          nameStatus: statusList[i],
-        });
-        if (!existItem) {
-          const createdStatus = new this.statusModel({
-            nameStatus: statusList[i],
-          });
-          return createdStatus.save();
-        }
-      }
-    }
-    return await this.statusModel.find();
+      return createdStatus.save();
+    });
+    return Promise.all(listPromises);
   }
 
-  public async existingSpecies(speciesList: any) {
-    const countElements = await this.speciesModel.countDocuments();
-    if (!countElements) {
-      const listPromises = speciesList.map(async (status: string) => {
-        const createdSpecies = new this.speciesModel({
-          nameSpecie: status,
-        });
-        return createdSpecies.save();
+  public async addSpecies(speciesList: any) {
+    const listPromises = speciesList.map(async (status: string) => {
+      const createdSpecies = new this.speciesModel({
+        nameSpecie: status,
       });
-      return Promise.all(listPromises);
-    } else {
-      for (let i = 0; i < speciesList.length; i++) {
-        const existItem = await this.speciesModel.findOne({
-          nameSpecie: speciesList[i],
-        });
-        if (!existItem) {
-          const createdStatus = new this.speciesModel({
-            nameSpecie: speciesList[i],
-          });
-          return createdStatus.save();
-        }
-      }
-    }
-    return await this.speciesModel.find();
+      return createdSpecies.save();
+    });
+    return Promise.all(listPromises);
   }
 
-  public async existingGender(genderList: any) {
-    const countElements = await this.genderModel.countDocuments();
-    if (!countElements) {
-      const listPromises = genderList.map(async (status: string) => {
-        const createdGender = new this.genderModel({
-          nameGender: status,
-        });
-        return createdGender.save();
+  public async addGender(genderList: any) {
+    const listPromises = genderList.map(async (status: string) => {
+      const createdGender = new this.genderModel({
+        nameGender: status,
       });
-      return Promise.all(listPromises);
-    } else {
-      for (let i = 0; i < genderList.length; i++) {
-        const existItem = await this.genderModel.findOne({
-          nameGender: genderList[i],
-        });
-        if (!existItem) {
-          const createdStatus = new this.genderModel({
-            nameGender: genderList[i],
-          });
-          return createdStatus.save();
-        }
-      }
-    }
-    return await this.genderModel.find();
+      return createdGender.save();
+    });
+    return Promise.all(listPromises);
   }
 
-  public async existingCharacters(charactersList: any) {
-    console.log(':D');
-    return 'characters';
+  public async searchStatus(value: string) {
+    const existValue = await this.statusModel.findOne({ nameStatus: value });
+    if (!existValue) {
+      throw Error(`The currently status: ${value} don't exist!`);
+    }
+    return existValue._id;
+  }
+
+  public async searchSpecies(value: string) {
+    const existValue = await this.speciesModel.findOne({ nameSpecie: value });
+    if (!existValue) {
+      throw Error(`The currently species: ${value} don't exist!`);
+    }
+    return existValue._id;
+  }
+
+  public async searchGender(value: string) {
+    const existValue = await this.genderModel.findOne({ nameGender: value });
+    if (!existValue) {
+      throw Error(`The currently gender: ${value} don't exist!`);
+    }
+    return existValue._id;
+  }
+
+  public async addCharacters(charactersList: any) {
+    const listPromises = await Promise.all(
+      charactersList.map(async ({ name, status, species, gender, image }) => {
+        const newCharacter = new this.charactersModel({
+          name,
+          status: await this.searchStatus(status),
+          species: await this.searchSpecies(species),
+          gender: await this.searchGender(gender),
+          image,
+        });
+        return newCharacter.save();
+      }),
+    );
+    return Promise.all(listPromises);
+  }
+
+  public async callaAPI() {
+    const { listStatus, listSpecies, listGender, listCharacters } =
+      await this.loadingCharacters();
+    if (!(await this.statusModel.countDocuments())) {
+      await this.addStatus(listStatus);
+    }
+    if (!(await this.speciesModel.countDocuments())) {
+      await this.addSpecies(listSpecies);
+    }
+    if (!(await this.genderModel.countDocuments())) {
+      await this.addGender(listGender);
+    }
+    if (!(await this.charactersModel.countDocuments())) {
+      await this.addCharacters(listCharacters);
+    }
+
+    return await this.charactersModel.find();
   }
 }
