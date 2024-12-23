@@ -22,7 +22,11 @@ export class CharactersService {
     return 'This action adds a new character';
   }
 
-  async findAll() {
+  async findAll(page) {
+    if (!page) {
+      page = 1;
+    }
+
     const results = await this.characterModel.find();
     const genderClear = await Promise.all(
       results.map(
@@ -50,7 +54,7 @@ export class CharactersService {
         }),
       ),
     );
-    return response(genderClear, 1, 'characters?');
+    return response(genderClear, page, 'characters?');
   }
 
   findOne(id: number) {
