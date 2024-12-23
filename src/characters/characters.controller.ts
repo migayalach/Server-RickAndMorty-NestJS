@@ -6,6 +6,7 @@ import {
   Patch,
   Param,
   Delete,
+  Query,
 } from '@nestjs/common';
 import { CharactersService } from './characters.service';
 import { CreateCharacterDto } from './dto/create-character.dto';
@@ -21,8 +22,8 @@ export class CharactersController {
   }
 
   @Get()
-  async findAll() {
-    return await this.charactersService.findAll();
+  async findAll(@Query('page') page: string) {
+    return await this.charactersService.findAll(page);
   }
 
   @Get(':id')
