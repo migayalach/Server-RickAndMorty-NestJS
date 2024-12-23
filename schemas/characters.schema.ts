@@ -1,16 +1,17 @@
 import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
-import { Gender, Species, Status, State, Create } from '@enum/character.enum';
+import { State, Create } from '@enum/character.enum';
+import { Document, Types } from 'mongoose';
 
 @Schema()
-export class Characters {
+export class Characters extends Document {
   @Prop()
   name: string;
-  @Prop()
-  status: Status;
-  @Prop()
-  species: Species;
-  @Prop()
-  gender: Gender;
+  @Prop({ type: Types.ObjectId, ref: 'Status', required: true })
+  status: Types.ObjectId;
+  @Prop({ type: Types.ObjectId, ref: 'Species', required: true })
+  species: Types.ObjectId;
+  @Prop({ type: Types.ObjectId, ref: 'Gender', required: true })
+  gender: Types.ObjectId;
   @Prop()
   image?: string;
   @Prop({ default: State.Active })
