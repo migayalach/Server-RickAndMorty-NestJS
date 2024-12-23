@@ -17,11 +17,11 @@ import { Status as StatusSchema } from '@schemas/status.schema';
 
 @Injectable()
 export class CharactersAPI {
-  private readonly API_CHARACTERS: string;
+  private API_CHARACTERS: string;
 
   constructor(
-    private readonly httpService: HttpService,
-    private readonly configService: ConfigService,
+    private httpService: HttpService,
+    private configService: ConfigService,
     @InjectModel(StatusSchema.name) private statusModel: Model<StatusSchema>,
     @InjectModel(SpeciesSchema.name) private speciesModel: Model<SpeciesSchema>,
     @InjectModel(GenderSchema.name) private genderModel: Model<GenderSchema>,
@@ -89,7 +89,7 @@ export class CharactersAPI {
     };
   }
 
-  public async addStatus(statusList: any) {
+  public async addStatus(statusList: string[]) {
     const listPromises = statusList.map(async (status: string) => {
       const createdStatus = new this.statusModel({
         nameStatus: status,
@@ -99,7 +99,7 @@ export class CharactersAPI {
     return Promise.all(listPromises);
   }
 
-  public async addSpecies(speciesList: any) {
+  public async addSpecies(speciesList: string[]) {
     const listPromises = speciesList.map(async (status: string) => {
       const createdSpecies = new this.speciesModel({
         nameSpecie: status,
@@ -109,13 +109,29 @@ export class CharactersAPI {
     return Promise.all(listPromises);
   }
 
-  public async addGender(genderList: any) {
+  public async addGender(genderList: string[]) {
     const listPromises = genderList.map(async (status: string) => {
       const createdGender = new this.genderModel({
         nameGender: status,
       });
       return createdGender.save();
     });
+    return Promise.all(listPromises);
+  }
+
+  public async addCharacters(charactersList: any) {
+    const listPromises = await Promise.all(
+      charactersList.map(async ({ name, status, species, gender, image }) => {
+        const newCharacter = new this.charactersModel({
+          name,
+          status: await this.searchStatus(status),
+          species: await this.searchSpecies(species),
+          gender: await this.searchGender(gender),
+          image,
+        });
+        return newCharacter.save();
+      }),
+    );
     return Promise.all(listPromises);
   }
 
@@ -143,22 +159,6 @@ export class CharactersAPI {
     return existValue._id;
   }
 
-  public async addCharacters(charactersList: any) {
-    const listPromises = await Promise.all(
-      charactersList.map(async ({ name, status, species, gender, image }) => {
-        const newCharacter = new this.charactersModel({
-          name,
-          status: await this.searchStatus(status),
-          species: await this.searchSpecies(species),
-          gender: await this.searchGender(gender),
-          image,
-        });
-        return newCharacter.save();
-      }),
-    );
-    return Promise.all(listPromises);
-  }
-
   public async callaAPI() {
     const { listStatus, listSpecies, listGender, listCharacters } =
       await this.loadingCharacters();
@@ -174,7 +174,6 @@ export class CharactersAPI {
     if (!(await this.charactersModel.countDocuments())) {
       await this.addCharacters(listCharacters);
     }
-
-    return await this.charactersModel.find();
+    return 'Data update successful!';
   }
 }
