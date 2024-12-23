@@ -8,6 +8,7 @@ import { Status } from '@schemas/status.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { response } from 'helpers/pagination';
+import { clearOneCharacter } from 'utils/auxUtil';
 
 @Injectable()
 export class CharactersService {
@@ -27,38 +28,22 @@ export class CharactersService {
       page = 1;
     }
 
-    const results = await this.characterModel.find();
-    const genderClear = await Promise.all(
-      results.map(
-        async ({
-          _id,
-          name,
-          status,
-          species,
-          gender,
-          image,
-          state,
-          create,
-          stars,
-        }) => ({
-          _id,
-          name,
-          status: (await this.statusModel.findOne({ _id: status })).nameStatus,
-          species: (await this.speciesModel.findOne({ _id: species }))
-            .nameSpecie,
-          gender: (await this.genderModel.findOne({ _id: gender })).nameGender,
-          image,
-          state,
-          create,
-          stars,
-        }),
-      ),
-    );
-    return response(genderClear, page, 'characters?');
+    const results = await this.characterModel
+      .find()
+      .populate('status', 'nameStatus -_id')
+      .populate('species', 'nameSpecie -_id')
+      .populate('gender', 'nameGender -_id');
+
+    return response(results, page, 'characters?');
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} character`;
+  async findOne(id: string) {
+    const character = await this.characterModel
+      .findOne({ _id: id })
+      .populate('status', 'nameStatus -_id')
+      .populate('species', 'nameSpecie -_id')
+      .populate('gender', 'nameGender -_id');
+    return clearOneCharacter(character);
   }
 
   update(id: number, updateCharacterDto: UpdateCharacterDto) {
