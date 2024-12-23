@@ -1,4 +1,6 @@
-const URL = `http://localhost:3001/api/`;
+import * as dotenv from 'dotenv';
+dotenv.config();
+const URL = process.env.URL;
 
 const nextRequest = (pages, page, site) => {
   if (page < pages) {
