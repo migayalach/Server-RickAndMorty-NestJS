@@ -1,3 +1,4 @@
+import { clearCharacter } from 'utils/auxUtil';
 import { navegation } from './navegation';
 
 const elements = 20;
@@ -13,7 +14,7 @@ function operation(data, init, end) {
       response.push(data[i]);
     }
   }
-  return response;
+  return clearCharacter(response);
 }
 
 function responseResults(data, limit) {
