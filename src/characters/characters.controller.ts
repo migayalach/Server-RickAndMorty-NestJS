@@ -32,11 +32,11 @@ export class CharactersController {
   }
 
   @Patch(':id')
-  update(
+  async update(
     @Param('id') id: string,
     @Body() updateCharacterDto: UpdateCharacterDto,
   ) {
-    return this.charactersService.update(+id, updateCharacterDto);
+    return await this.charactersService.update(id, updateCharacterDto);
   }
 
   @Delete(':id')
