@@ -23,7 +23,7 @@ export class CharactersController {
 
   @Get()
   async findAll(@Query('page') page: string) {
-    return await this.charactersService.findAll(page);
+    return await this.charactersService.findAll(+page);
   }
 
   @Get(':id')
