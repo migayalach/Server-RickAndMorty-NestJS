@@ -1,4 +1,11 @@
-import { Gender, Species, Status } from 'types/enum/character.enum';
+import { Types } from 'mongoose';
+import {
+  Gender,
+  Species,
+  Status,
+  State,
+  Create,
+} from 'types/enum/character.enum';
 
 export interface CharactersInterface {
   name: string;
@@ -13,4 +20,16 @@ export interface CharacterLists {
   listSpecies: Species[];
   listGender: Gender[];
   listCharacters: CharactersInterface[];
+}
+
+export interface CharacterResponse {
+  _id: Types.ObjectId;
+  name: string;
+  status: Status;
+  species: Species;
+  gender: Gender;
+  image?: string;
+  state: State;
+  create: Create;
+  stars: number;
 }
