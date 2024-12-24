@@ -7,6 +7,9 @@ import { FavoritesModule } from './favorites/favorites.module';
 import { AuditFavoritesModule } from './audit-favorites/audit-favorites.module';
 import { LoadingCharactersModule } from './loading-characters/loading-characters.module';
 import { ConfigModule } from '@nestjs/config';
+import { QualifiacationModule } from './qualifiacation/qualifiacation.module';
+import { ChangePasswordModule } from './change-password/change-password.module';
+import { LevelModule } from './level/level.module';
 
 @Module({
   imports: [
@@ -18,6 +21,9 @@ import { ConfigModule } from '@nestjs/config';
     MongooseModule.forRoot('mongodb://localhost/rickAndMorty'),
     LoadingCharactersModule,
     ConfigModule.forRoot({ isGlobal: true }),
+    QualifiacationModule,
+    ChangePasswordModule,
+    LevelModule,
   ],
   controllers: [],
   providers: [],
