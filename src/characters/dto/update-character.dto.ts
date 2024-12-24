@@ -26,5 +26,5 @@ export class UpdateCharacterDto extends PartialType(CreateCharacterDto) {
 
   @IsNotEmpty()
   @IsEnum(State)
-  create: State;
+  state: State;
 }
