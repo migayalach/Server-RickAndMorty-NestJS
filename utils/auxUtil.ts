@@ -1,4 +1,6 @@
-export const clearCharacter = (array) => {
+import { CharacterResponse } from '@interfaces/character.interface';
+
+export const clearCharacter = (array: Array<any>): CharacterResponse[] => {
   return array.map(
     ({
       _id,
