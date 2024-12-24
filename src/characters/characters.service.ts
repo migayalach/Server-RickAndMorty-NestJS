@@ -6,9 +6,10 @@ import { Gender } from '@schemas/gender.schema';
 import { Species } from '@schemas/species.schema';
 import { Status } from '@schemas/status.schema';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { response } from 'helpers/pagination';
 import { clearOneCharacter } from 'utils/auxUtil';
+import { Create } from '@enum/character.enum';
 
 @Injectable()
 export class CharactersService {
@@ -19,8 +20,17 @@ export class CharactersService {
     @InjectModel(Status.name) private statusModel: Model<Status>,
   ) {}
 
-  create(createCharacterDto: CreateCharacterDto) {
-    return 'This action adds a new character';
+  async create(createCharacterDto: CreateCharacterDto) {
+    const clearData = {
+      name: createCharacterDto.name,
+      status: new Types.ObjectId(createCharacterDto.status),
+      species: new Types.ObjectId(createCharacterDto.species),
+      gender: new Types.ObjectId(createCharacterDto.gender),
+      image: createCharacterDto.image,
+      create: Create.User,
+    };
+    const newCharacter = new this.characterModel(clearData);
+    return await newCharacter.save();
   }
 
   async findAll(page) {
@@ -50,7 +60,7 @@ export class CharactersService {
     return `This action updates a #${id} character`;
   }
 
-  remove(id: number) {
+  async remove(id: string) {
     return `This action removes a #${id} character`;
   }
 }
