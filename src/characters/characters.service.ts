@@ -7,6 +7,7 @@ import { Model, Types } from 'mongoose';
 import { response } from 'helpers/pagination';
 import { clearOneCharacter } from 'utils/auxUtil';
 import { Create } from '@enum/character.enum';
+import { PaginatedResponse } from '@interfaces/response.interface';
 
 @Injectable()
 export class CharactersService {
@@ -24,21 +25,25 @@ export class CharactersService {
       create: Create.User,
     };
     const newCharacter = new this.characterModel(clearData);
-    return await newCharacter.save();
+    await newCharacter.save();
+    return `Character added successfully!`;
   }
 
-  async findAll(page) {
-    if (!page) {
-      page = 1;
+  async findAll(page?: number): Promise<PaginatedResponse> {
+    try {
+      if (!page) {
+        page = 1;
+      }
+      const results = await this.characterModel
+        .find()
+        .populate('status', 'nameStatus -_id')
+        .populate('species', 'nameSpecie -_id')
+        .populate('gender', 'nameGender -_id');
+
+      return response(results, page, 'characters?');
+    } catch (error) {
+      throw Error(`Error: ${error}`);
     }
-
-    const results = await this.characterModel
-      .find()
-      .populate('status', 'nameStatus -_id')
-      .populate('species', 'nameSpecie -_id')
-      .populate('gender', 'nameGender -_id');
-
-    return response(results, page, 'characters?');
   }
 
   async findOne(id: string) {
