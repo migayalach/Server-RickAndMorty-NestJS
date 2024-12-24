@@ -56,11 +56,20 @@ export class CharactersService {
     return clearOneCharacter(character);
   }
 
-  update(id: number, updateCharacterDto: UpdateCharacterDto) {
-    return `This action updates a #${id} character`;
+  async update(id: string, updateCharacterDto: UpdateCharacterDto) {
+    const clearData = {
+      name: updateCharacterDto.name,
+      status: new Types.ObjectId(updateCharacterDto.status),
+      species: new Types.ObjectId(updateCharacterDto.species),
+      gender: new Types.ObjectId(updateCharacterDto.gender),
+      image: updateCharacterDto.image,
+      state: updateCharacterDto.state,
+    };
+    await this.characterModel.findByIdAndUpdate(id, clearData);
+    return await this.findOne(id);
   }
 
   async remove(id: string) {
-    return `This action removes a #${id} character`;
+    return this.characterModel.findByIdAndDelete(id);
   }
 }
