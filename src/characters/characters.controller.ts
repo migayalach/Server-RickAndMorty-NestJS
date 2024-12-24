@@ -17,8 +17,8 @@ export class CharactersController {
   constructor(private readonly charactersService: CharactersService) {}
 
   @Post()
-  create(@Body() createCharacterDto: CreateCharacterDto) {
-    return this.charactersService.create(createCharacterDto);
+  async create(@Body() createCharacterDto: CreateCharacterDto) {
+    return await this.charactersService.create(createCharacterDto);
   }
 
   @Get()
@@ -40,7 +40,7 @@ export class CharactersController {
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.charactersService.remove(+id);
+  async remove(@Param('id') id: string) {
+    return await this.charactersService.remove(id);
   }
 }
