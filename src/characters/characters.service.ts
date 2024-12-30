@@ -1,18 +1,20 @@
 import { Injectable } from '@nestjs/common';
 import { CreateCharacterDto } from './dto/create-character.dto';
 import { UpdateCharacterDto } from './dto/update-character.dto';
-import { Characters } from '@schemas/characters.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { response } from 'helpers/pagination';
 import { clearOneCharacter } from 'utils/auxUtil';
 import { Create } from '@enum/character.enum';
 import { PaginatedResponse } from '@interfaces/response.interface';
+import { Characters } from '@schemas/characters.schema';
+import { AuxResponse } from 'src/aux-response/aux-response';
 
 @Injectable()
 export class CharactersService {
   constructor(
     @InjectModel(Characters.name) private characterModel: Model<Characters>,
+    private readonly auxRequest: AuxResponse,
   ) {}
 
   async create(createCharacterDto: CreateCharacterDto) {
@@ -69,6 +71,19 @@ export class CharactersService {
   }
 
   async remove(id: string) {
-    return this.characterModel.findByIdAndDelete(id);
+    try {
+      await this.auxRequest.characterExist(id);
+      await this.characterModel.findByIdAndDelete(id);
+      return `Character successfully deleted.`;
+    } catch (error) {
+      if (error.status === 404 || error.status === 403) {
+        return {
+          response: error.response,
+          status: error.status,
+        };
+      }
+      console.error('Unexpected error:', error);
+      return `So sorry something went wrong!`;
+    }
   }
 }
