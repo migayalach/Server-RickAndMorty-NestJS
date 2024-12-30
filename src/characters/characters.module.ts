@@ -6,6 +6,7 @@ import { Characters, Characters_Schema } from '@schemas/characters.schema';
 import { Gender, Gender_Schema } from '@schemas/gender.schema';
 import { Species, Specie_Schema } from '@schemas/species.schema';
 import { Status, Status_Schema } from '@schemas/status.schema';
+import { AuxResponse } from 'src/aux-response/aux-response';
 
 @Module({
   imports: [
@@ -17,6 +18,6 @@ import { Status, Status_Schema } from '@schemas/status.schema';
     ]),
   ],
   controllers: [CharactersController],
-  providers: [CharactersService],
+  providers: [CharactersService, AuxResponse],
 })
 export class CharactersModule {}
