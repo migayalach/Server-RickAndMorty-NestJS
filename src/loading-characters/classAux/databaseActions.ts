@@ -12,9 +12,4 @@ export class DataBaseActions {
     const countCharacters = await this.charactersModel.countDocuments();
     return countCharacters;
   }
-
-  // public postCharacters() {}
-  // public postSpecies() {}
-  // public postGender() {}
-  // public postStatus() {}
 }
