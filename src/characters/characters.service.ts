@@ -9,6 +9,7 @@ import { Create } from '@enum/character.enum';
 import { PaginatedResponse } from '@interfaces/response.interface';
 import { Characters } from '@schemas/characters.schema';
 import { AuxResponse } from 'src/aux-response/aux-response';
+import { clearCharacter } from 'utils/auxUtil';
 
 @Injectable()
 export class CharactersService {
@@ -56,7 +57,7 @@ export class CharactersService {
         .populate('status', 'nameStatus -_id')
         .populate('species', 'nameSpecie -_id')
         .populate('gender', 'nameGender -_id');
-      return response(results, page, 'characters?');
+      return response(clearCharacter(results), page, 'characters?');
     } catch (error) {
       throw Error(`Error: ${error}`);
     }
