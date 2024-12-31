@@ -1,4 +1,3 @@
-import { clearCharacter } from 'utils/auxUtil';
 import { navegation } from './navegation';
 import { PaginatedResponse } from '@interfaces/response.interface';
 import { CharacterResponse } from '@interfaces/character.interface';
@@ -20,7 +19,7 @@ function operation(
       response.push(data[i] as CharacterResponse);
     }
   }
-  return clearCharacter(response);
+  return response;
 }
 
 function responseResults(
