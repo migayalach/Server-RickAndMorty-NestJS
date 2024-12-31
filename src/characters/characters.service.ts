@@ -18,17 +18,32 @@ export class CharactersService {
   ) {}
 
   async create(createCharacterDto: CreateCharacterDto) {
-    const clearData = {
-      name: createCharacterDto.name,
-      status: new Types.ObjectId(createCharacterDto.status),
-      species: new Types.ObjectId(createCharacterDto.species),
-      gender: new Types.ObjectId(createCharacterDto.gender),
-      image: createCharacterDto.image,
-      create: Create.User,
-    };
-    const newCharacter = new this.characterModel(clearData);
-    await newCharacter.save();
-    return `Character added successfully!`;
+    try {
+      await this.auxRequest.duplicateName(createCharacterDto.name, '');
+      await this.auxRequest.existStatus(createCharacterDto.status);
+      await this.auxRequest.existSpecies(createCharacterDto.species);
+      await this.auxRequest.existGender(createCharacterDto.gender);
+      const clearData = {
+        name: createCharacterDto.name,
+        status: new Types.ObjectId(createCharacterDto.status),
+        species: new Types.ObjectId(createCharacterDto.species),
+        gender: new Types.ObjectId(createCharacterDto.gender),
+        image: createCharacterDto.image,
+        create: Create.User,
+      };
+      const newCharacter = new this.characterModel(clearData);
+      await newCharacter.save();
+      return `Character added successfully!`;
+    } catch (error) {
+      if (error?.status === 409 || error?.status === 404) {
+        return {
+          response: error.response,
+          status: error.status,
+        };
+      }
+      console.error('Unexpected error:', error);
+      return `So sorry something went wrong!`;
+    }
   }
 
   async findAll(page?: number): Promise<PaginatedResponse> {
@@ -41,7 +56,6 @@ export class CharactersService {
         .populate('status', 'nameStatus -_id')
         .populate('species', 'nameSpecie -_id')
         .populate('gender', 'nameGender -_id');
-
       return response(results, page, 'characters?');
     } catch (error) {
       throw Error(`Error: ${error}`);
@@ -49,34 +63,63 @@ export class CharactersService {
   }
 
   async findOne(id: string) {
-    const character = await this.characterModel
-      .findOne({ _id: id })
-      .populate('status', 'nameStatus -_id')
-      .populate('species', 'nameSpecie -_id')
-      .populate('gender', 'nameGender -_id');
-    return clearOneCharacter(character);
+    try {
+      await this.auxRequest.existCharacter(id);
+      const character = await this.characterModel
+        .findOne({ _id: id })
+        .populate('status', 'nameStatus -_id')
+        .populate('species', 'nameSpecie -_id')
+        .populate('gender', 'nameGender -_id');
+      return clearOneCharacter(character);
+    } catch (error) {
+      if (error?.status === 404) {
+        return {
+          response: error.response,
+          status: error.status,
+        };
+      }
+      console.error('Unexpected error:', error);
+      return `So sorry something went wrong!`;
+    }
   }
 
   async update(id: string, updateCharacterDto: UpdateCharacterDto) {
-    const clearData = {
-      name: updateCharacterDto.name,
-      status: new Types.ObjectId(updateCharacterDto.status),
-      species: new Types.ObjectId(updateCharacterDto.species),
-      gender: new Types.ObjectId(updateCharacterDto.gender),
-      image: updateCharacterDto.image,
-      state: updateCharacterDto.state,
-    };
-    await this.characterModel.findByIdAndUpdate(id, clearData);
-    return await this.findOne(id);
+    try {
+      await this.auxRequest.existCharacter(id);
+      await this.auxRequest.duplicateName(updateCharacterDto.name, id);
+      await this.auxRequest.existStatus(updateCharacterDto.status);
+      await this.auxRequest.existSpecies(updateCharacterDto.species);
+      await this.auxRequest.existGender(updateCharacterDto.gender);
+      const clearData = {
+        name: updateCharacterDto.name,
+        status: new Types.ObjectId(updateCharacterDto.status),
+        species: new Types.ObjectId(updateCharacterDto.species),
+        gender: new Types.ObjectId(updateCharacterDto.gender),
+        image: updateCharacterDto.image,
+        state: updateCharacterDto.state,
+      };
+      await this.characterModel.findByIdAndUpdate(id, clearData);
+      return await this.findOne(id);
+    } catch (error) {
+      if (error?.status === 409 || error?.status === 404) {
+        return {
+          response: error.response,
+          status: error.status,
+        };
+      }
+      console.error('Unexpected error:', error);
+      return `So sorry something went wrong!`;
+    }
   }
 
   async remove(id: string) {
     try {
-      await this.auxRequest.characterExist(id);
+      const dataInfo: Create = await this.auxRequest.characterExist(id);
+      this.auxRequest.characterStatusCreate(dataInfo);
       await this.characterModel.findByIdAndDelete(id);
       return `Character successfully deleted.`;
     } catch (error) {
-      if (error.status === 404 || error.status === 403) {
+      if (error?.status === 404 || error?.status === 403) {
         return {
           response: error.response,
           status: error.status,
