@@ -1,26 +1,36 @@
 import { Injectable } from '@nestjs/common';
-import { CreateLevelDto } from './dto/create-level.dto';
-import { UpdateLevelDto } from './dto/update-level.dto';
+import { InjectModel } from '@nestjs/mongoose';
+import { Level } from '@schemas/level.schema';
+import { Model } from 'mongoose';
 
 @Injectable()
 export class LevelService {
-  create(createLevelDto: CreateLevelDto) {
-    return 'This action adds a new level';
+  constructor(@InjectModel(Level.name) private levelModel: Model<Level>) {}
+
+  public async createLevel() {
+    const list = ['Admin', 'Standar'];
+    const listPromises = list.map(async (nameLevel: string) => {
+      const levelCreate = new this.levelModel({
+        nameLevel,
+      });
+      return levelCreate.save();
+    });
+    return await Promise.all(listPromises);
   }
 
-  findAll() {
-    return `This action returns all level`;
+  public async getAllLevel() {
+    return await this.levelModel.find({}, '_id nameLevel');
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} level`;
-  }
-
-  update(id: number, updateLevelDto: UpdateLevelDto) {
-    return `This action updates a #${id} level`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} level`;
+  async findAll() {
+    try {
+      if (!(await this.levelModel.countDocuments())) {
+        await this.createLevel();
+      }
+      return await this.getAllLevel();
+    } catch (error) {
+      console.error('Unexpected error:', error);
+      return `So sorry something went wrong!`;
+    }
   }
 }
