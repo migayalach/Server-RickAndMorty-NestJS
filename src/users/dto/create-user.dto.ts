@@ -3,17 +3,14 @@ import {
   IsNotEmpty,
   IsOptional,
   IsEmail,
-  // IsMongoId,
   IsEnum,
 } from 'class-validator';
 import { RecordSingUp } from '@enum/user.enum';
 
 export class CreateUserDto {
-  // @IsMongoId()
-  // @IsNotEmpty()
   @IsString()
   @IsOptional()
-  levelUser?: string;
+  idLevel?: string;
 
   @IsString()
   @IsNotEmpty()
