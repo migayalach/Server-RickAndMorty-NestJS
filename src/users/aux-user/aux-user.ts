@@ -26,9 +26,12 @@ export class AuxUser {
     return infoLevel._id;
   }
 
-  public async duplicateEmail(email, flag) {
-    console.log(email, flag);
-    return '2';
+  public async duplicateEmail(email: string) {
+    const data = await this.userModel.findOne({ emailUser: email });
+    if (data) {
+      throw new HttpException(`This email exist!`, HttpStatus.CONFLICT);
+    }
+    return;
   }
 
   public async existLevel(idLevel: string) {
