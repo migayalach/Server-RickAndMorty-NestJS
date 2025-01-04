@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { AuxUser } from './aux-user/aux-user';
@@ -7,6 +7,7 @@ import { response } from 'helpers/pagination';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { User } from '@schemas/users.chema';
+import { clearOneUser, clearUsers } from 'utils/auxUtil';
 
 @Injectable()
 export class UsersService {
@@ -17,9 +18,10 @@ export class UsersService {
 
   async create(createUserDto: CreateUserDto) {
     try {
+      await this.auxUser.duplicateEmail(createUserDto.emailUser);
       if (createUserDto.recordType === RecordSingUp.Standar) {
         const clearData = {
-          levelUser: await this.auxUser.countUsers(),
+          idLevel: await this.auxUser.countUsers(),
           nameUser: createUserDto.nameUser,
           emailUser: createUserDto.emailUser,
           passwordUser: createUserDto.passwordUser,
@@ -29,9 +31,9 @@ export class UsersService {
         await newUser.save();
         return 'User added successfully';
       } else if (createUserDto.recordType === RecordSingUp.Admin) {
-        await this.auxUser.existLevel(createUserDto.levelUser);
+        await this.auxUser.existLevel(createUserDto.idLevel);
         const clearData = {
-          levelUser: new Types.ObjectId(createUserDto.levelUser),
+          idLevel: new Types.ObjectId(createUserDto.idLevel),
           nameUser: createUserDto.nameUser,
           emailUser: createUserDto.emailUser,
           passwordUser: createUserDto.passwordUser,
@@ -41,7 +43,16 @@ export class UsersService {
         await newUser.save();
         return 'User added';
       }
-    } catch (error) {}
+    } catch (error) {
+      if (error?.status === 409 || error?.status === 404) {
+        throw error;
+      }
+      // console.error('Unexpected error:', error);
+      throw new HttpException(
+        'So sorry something went wrong!',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
 
   async findAll(page?: number) {
@@ -49,26 +60,82 @@ export class UsersService {
       if (!page) {
         page = 1;
       }
-      const results = await this.userModel.find();
-      return response(results, page, 'users?');
-    } catch (error) {}
+      const results = await this.userModel
+        .find({}, { passwordUser: 0 })
+        .populate('idLevel', 'nameLevel');
+      return response(clearUsers(results), page, 'users?');
+    } catch (error) {
+      console.error('Unexpected error:', error);
+      throw new HttpException(
+        'So sorry something went wrong!',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
 
-  async findOne(id: number) {
+  async findOne(idUser: string) {
     try {
-      return `This action returns a #${id} user`;
-    } catch (error) {}
+      const userInfo = await this.userModel
+        .findById(idUser, { passwordUser: 0, __v: 0 })
+        .populate('idLevel', 'nameLevel');
+      if (!userInfo) {
+        throw new HttpException(
+          `Sorry this user don't exist`,
+          HttpStatus.NOT_FOUND,
+        );
+      }
+      return clearOneUser(userInfo);
+    } catch (error) {
+      if (error?.status === 404) {
+        throw error;
+      }
+      // console.error('Unexpected error:', error);
+      throw new HttpException(
+        'So sorry something went wrong!',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
+  async update(idUser: string, updateUserDto: UpdateUserDto) {
     try {
-      return `This action updates a #${id} user`;
-    } catch (error) {}
+      await this.findOne(idUser);
+      await this.auxUser.existLevel(updateUserDto.idLevel);
+      const clearData = {
+        idLevel: new Types.ObjectId(updateUserDto.idLevel),
+        nameUser: updateUserDto.nameUser,
+        emailUser: updateUserDto.emailUser,
+        photoUser: updateUserDto.photoUser,
+        statusUser: updateUserDto.statusUser,
+      };
+      await this.userModel.findByIdAndUpdate(idUser, clearData);
+      return await this.findOne(idUser);
+    } catch (error) {
+      if (error?.status === 404) {
+        throw error;
+      }
+      console.error('Unexpected error:', error);
+      throw new HttpException(
+        'So sorry something went wrong!',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
 
-  remove(id: number) {
+  async remove(idUser: string) {
     try {
-      return `This action removes a #${id} user`;
-    } catch (error) {}
+      await this.findOne(idUser);
+      await this.userModel.findByIdAndDelete(idUser);
+      return await this.findAll();
+    } catch (error) {
+      if (error?.status === 404) {
+        throw error;
+      }
+      // console.error('Unexpected error:', error);
+      throw new HttpException(
+        'So sorry something went wrong!',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
 }
