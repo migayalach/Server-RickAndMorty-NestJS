@@ -64,3 +64,45 @@ export const clearOneUser = (user) => {
     statusUser: user.statusUser,
   };
 };
+
+// !BEFORE
+// export const clearFavorites = (array) => {
+//   console.log(array);
+
+//   const data = array.map((index) => ({
+//     idFavorite: index.idFavorite,
+//     idStatus: index.statusData._id,
+//     idSpecies: index.speciesData._id,
+//     idGender: index.genderData._id,
+//     idUser: index.idUser,
+//     idCharacter: index.idCharacter,
+//     nameCharacter: index.nameCharacter,
+//     status: index.statusData.nameStatus,
+//     species: index.speciesData.nameSpecie,
+//     gender: index.genderData.nameGender,
+//     image: index.image,
+//     state: index.state,
+//     create: index.create,
+//     stars: index.stars,
+//   }));
+//   return data;
+// };
+
+export const clearFavorites = (array) => {
+  return array.map((index) => ({
+    idFavorite: index._id,
+    idStatus: index.idCharacter.status._id,
+    idSpecies: index.idCharacter.species._id,
+    idGender: index.idCharacter.gender._id,
+    idUser: index.idUser,
+    idCharacter: index.idCharacter._id,
+    nameCharacter: index.idCharacter.name,
+    status: index.idCharacter.status.nameStatus,
+    species: index.idCharacter.species.nameSpecie,
+    gender: index.idCharacter.gender.nameGender,
+    image: index.idCharacter.image,
+    state: index.idCharacter.state,
+    create: index.idCharacter.create,
+    stars: index.idCharacter.stars,
+  }));
+};
