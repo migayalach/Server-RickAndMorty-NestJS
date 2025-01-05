@@ -1,4 +1,12 @@
-import { Controller, Get, Post, Body, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  Delete,
+  Query,
+} from '@nestjs/common';
 import { FavoritesService } from './favorites.service';
 import { CreateFavoriteDto } from './dto/create-favorite.dto';
 
@@ -11,13 +19,16 @@ export class FavoritesController {
     return await this.favoritesService.create(createFavoriteDto);
   }
 
-  @Get()
-  async findAll() {
-    return await this.favoritesService.findAll();
+  @Get(':idUser')
+  async findAll(@Param('idUser') idUser: string, @Query('page') page: string) {
+    return await this.favoritesService.findAll(idUser, +page);
   }
 
-  @Delete(':idFavorite')
-  async remove(@Param('idFavorite') idFavorite: string) {
-    return await this.favoritesService.remove(idFavorite);
+  @Delete(':idUser/:idFavorite')
+  async remove(
+    @Param('idUser') idUser: string,
+    @Param('idFavorite') idFavorite: string,
+  ) {
+    return await this.favoritesService.remove(idUser, idFavorite);
   }
 }
