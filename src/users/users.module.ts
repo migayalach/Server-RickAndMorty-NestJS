@@ -7,6 +7,7 @@ import { AuxUser } from './aux-user/aux-user';
 import { Level, Level_Schema } from '@schemas/level.schema';
 
 @Module({
+  exports: [UsersService],
   imports: [
     MongooseModule.forFeature([
       { name: User.name, schema: User_Schema },
