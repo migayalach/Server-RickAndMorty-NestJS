@@ -8,19 +8,7 @@ export class QualifiacationService {
     return 'This action adds a new qualifiacation';
   }
 
-  findAll() {
-    return `This action returns all qualifiacation`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} qualifiacation`;
-  }
-
   update(id: number, updateQualifiacationDto: UpdateQualifiacationDto) {
     return `This action updates a #${id} qualifiacation`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} qualifiacation`;
   }
 }
