@@ -9,6 +9,7 @@ import { Status, Status_Schema } from '@schemas/status.schema';
 import { AuxResponse } from 'src/aux-response/aux-response';
 
 @Module({
+  exports: [CharactersService],
   imports: [
     MongooseModule.forFeature([
       { name: Characters.name, schema: Characters_Schema },
