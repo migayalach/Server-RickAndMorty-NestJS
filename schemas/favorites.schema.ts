@@ -5,6 +5,8 @@ import { Document, Types } from 'mongoose';
 export class Favorites extends Document {
   @Prop({ type: Types.ObjectId, ref: 'User' })
   idUser: Types.ObjectId;
+  @Prop({ type: Types.ObjectId, ref: 'Characters' })
+  idCharacter: Types.ObjectId;
 }
 
 export const Favorites_Schema = SchemaFactory.createForClass(Favorites);
