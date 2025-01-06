@@ -97,7 +97,6 @@ export class CharactersService {
         species: new Types.ObjectId(updateCharacterDto.species),
         gender: new Types.ObjectId(updateCharacterDto.gender),
         image: updateCharacterDto.image,
-        state: updateCharacterDto.state,
       };
       await this.characterModel.findByIdAndUpdate(id, clearData);
       return await this.findOne(id);
