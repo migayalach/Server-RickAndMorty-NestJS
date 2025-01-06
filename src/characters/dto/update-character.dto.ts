@@ -1,7 +1,6 @@
-import { IsString, IsNotEmpty, IsOptional, IsEnum } from 'class-validator';
+import { IsString, IsNotEmpty, IsOptional } from 'class-validator';
 import { PartialType } from '@nestjs/mapped-types';
 import { CreateCharacterDto } from './create-character.dto';
-import { State } from '@enum/character.enum';
 
 export class UpdateCharacterDto extends PartialType(CreateCharacterDto) {
   @IsString()
@@ -23,8 +22,4 @@ export class UpdateCharacterDto extends PartialType(CreateCharacterDto) {
   @IsString()
   @IsOptional()
   image?: string;
-
-  @IsNotEmpty()
-  @IsEnum(State)
-  state: State;
 }
