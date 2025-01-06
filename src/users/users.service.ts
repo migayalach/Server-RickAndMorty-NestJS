@@ -2,10 +2,9 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { AuxUser } from './aux-user/aux-user';
-import { RecordSingUp } from '@enum/user.enum';
 import { response } from 'helpers/pagination';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model, Types } from 'mongoose';
+import { Model } from 'mongoose';
 import { User } from '@schemas/users.chema';
 import { clearOneUser, clearUsers } from 'utils/auxUtil';
 
@@ -18,31 +17,15 @@ export class UsersService {
 
   async create(createUserDto: CreateUserDto) {
     try {
-      await this.auxUser.duplicateEmail(createUserDto.emailUser);
-      if (createUserDto.recordType === RecordSingUp.Standar) {
-        const clearData = {
-          idLevel: await this.auxUser.countUsers(),
-          nameUser: createUserDto.nameUser,
-          emailUser: createUserDto.emailUser,
-          passwordUser: createUserDto.passwordUser,
-          photoUser: createUserDto.photoUser,
-        };
-        const newUser = new this.userModel(clearData);
-        await newUser.save();
-        return 'User added successfully';
-      } else if (createUserDto.recordType === RecordSingUp.Admin) {
-        await this.auxUser.existLevel(createUserDto.idLevel);
-        const clearData = {
-          idLevel: new Types.ObjectId(createUserDto.idLevel),
-          nameUser: createUserDto.nameUser,
-          emailUser: createUserDto.emailUser,
-          passwordUser: createUserDto.passwordUser,
-          photoUser: createUserDto.photoUser,
-        };
-        const newUser = new this.userModel(clearData);
-        await newUser.save();
-        return 'User added';
-      }
+      const clearData = {
+        nameUser: createUserDto.nameUser,
+        emailUser: await this.auxUser.duplicateEmail(createUserDto.emailUser),
+        passwordUser: createUserDto.passwordUser,
+        photoUser: createUserDto.photoUser,
+      };
+      const newUser = new this.userModel(clearData);
+      await newUser.save();
+      return 'User added';
     } catch (error) {
       if (error?.status === 409 || error?.status === 404) {
         throw error;
@@ -60,9 +43,7 @@ export class UsersService {
       if (!page) {
         page = 1;
       }
-      const results = await this.userModel
-        .find({}, { passwordUser: 0 })
-        .populate('idLevel', 'nameLevel');
+      const results = await this.userModel.find({}, { passwordUser: 0 });
       return response(clearUsers(results), page, 'users?');
     } catch (error) {
       console.error('Unexpected error:', error);
@@ -75,9 +56,10 @@ export class UsersService {
 
   async findOne(idUser: string) {
     try {
-      const userInfo = await this.userModel
-        .findById(idUser, { passwordUser: 0, __v: 0 })
-        .populate('idLevel', 'nameLevel');
+      const userInfo = await this.userModel.findById(idUser, {
+        passwordUser: 0,
+        __v: 0,
+      });
       if (!userInfo) {
         throw new HttpException(
           `Sorry this user don't exist`,
@@ -100,13 +82,10 @@ export class UsersService {
   async update(idUser: string, updateUserDto: UpdateUserDto) {
     try {
       await this.findOne(idUser);
-      await this.auxUser.existLevel(updateUserDto.idLevel);
       const clearData = {
-        idLevel: new Types.ObjectId(updateUserDto.idLevel),
         nameUser: updateUserDto.nameUser,
         emailUser: updateUserDto.emailUser,
         photoUser: updateUserDto.photoUser,
-        statusUser: updateUserDto.statusUser,
       };
       await this.userModel.findByIdAndUpdate(idUser, clearData);
       return await this.findOne(idUser);
