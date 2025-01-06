@@ -18,8 +18,6 @@ export class Characters extends Document {
   state: State;
   @Prop({ default: Create.Api })
   create: Create;
-  @Prop({ default: 0 })
-  stars: number;
 }
 
 export const Characters_Schema = SchemaFactory.createForClass(Characters);
