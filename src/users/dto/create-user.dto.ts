@@ -1,17 +1,6 @@
-import {
-  IsString,
-  IsNotEmpty,
-  IsOptional,
-  IsEmail,
-  IsEnum,
-} from 'class-validator';
-import { RecordSingUp } from '@enum/user.enum';
+import { IsString, IsNotEmpty, IsOptional, IsEmail } from 'class-validator';
 
 export class CreateUserDto {
-  @IsString()
-  @IsOptional()
-  idLevel?: string;
-
   @IsString()
   @IsNotEmpty()
   nameUser: string;
@@ -27,8 +16,4 @@ export class CreateUserDto {
   @IsString()
   @IsOptional()
   photoUser?: string;
-
-  @IsNotEmpty()
-  @IsEnum(RecordSingUp)
-  recordType: RecordSingUp;
 }
