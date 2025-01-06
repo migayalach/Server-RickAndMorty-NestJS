@@ -1,11 +1,9 @@
 import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
-import { Document, Types } from 'mongoose';
+import { Document } from 'mongoose';
 import { State } from '@enum/character.enum';
 
 @Schema()
 export class User extends Document {
-  @Prop({ type: Types.ObjectId, ref: 'Level' })
-  idLevel: Types.ObjectId;
   @Prop()
   nameUser: string;
   @Prop()
