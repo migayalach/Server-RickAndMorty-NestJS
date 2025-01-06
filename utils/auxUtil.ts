@@ -43,9 +43,7 @@ export const clearOneCharacter = (character) => {
 export const clearUsers = (array) => {
   const clearInfo = array.map((index) => ({
     idUser: index._id,
-    idLevel: index.idLevel._id,
-    nameUser: index.idLevel.nameLevel,
-    nameLevel: index.nameUser,
+    nameUser: index.nameUser,
     emailUser: index.emailUser,
     photoUser: index.photoUser,
     statusUser: index.statusUser,
@@ -56,8 +54,6 @@ export const clearUsers = (array) => {
 export const clearOneUser = (user) => {
   return {
     idUser: user._id,
-    idLevel: user.idLevel._id,
-    nameUser: user.idLevel.nameLevel,
     nameLevel: user.nameUser,
     emailUser: user.emailUser,
     photoUser: user?.photoUser,
@@ -101,8 +97,5 @@ export const clearFavorites = (array) => {
     species: index.idCharacter.species.nameSpecie,
     gender: index.idCharacter.gender.nameGender,
     image: index.idCharacter.image,
-    state: index.idCharacter.state,
-    create: index.idCharacter.create,
-    stars: index.idCharacter.stars,
   }));
 };
