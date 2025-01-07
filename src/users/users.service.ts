@@ -7,6 +7,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { User } from '@schemas/users.chema';
 import { clearOneUser, clearUsers } from 'utils/auxUtil';
+import * as bycrypt from 'bcrypt';
 
 @Injectable()
 export class UsersService {
@@ -20,7 +21,7 @@ export class UsersService {
       const clearData = {
         nameUser: createUserDto.nameUser,
         emailUser: await this.auxUser.duplicateEmail(createUserDto.emailUser),
-        passwordUser: createUserDto.passwordUser,
+        passwordUser: await bycrypt.hash(createUserDto.passwordUser, 10),
         photoUser: createUserDto.photoUser,
       };
       const newUser = new this.userModel(clearData);
